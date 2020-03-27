@@ -1,0 +1,58 @@
+server:
+  port: 5000
+eureka:
+  client:
+    service-url:
+      defaultZone: http://192.168.174.226:3000/eureka/
+  instance:
+    instance-id: user-1 #此实例注册到eureka服务端得唯一得实例ID
+    prefer-ip-address: true #是否显示ip地址
+    lease-renewal-interval-in-seconds: 1 #心跳间隔
+    lease-expiration-duration-in-seconds: 3 #超过30秒没有发送心跳，说明该节点已经宕机 默认为90秒
+spring:
+  application:
+    name: server-user #客户端得名字
+  zipkin:
+    base-url: http://localhost:9000  #指定Zipkin server地址
+  sleuth:
+    sampler:
+      probability: 1.0  #request采样的数量得标准 默认是0.1 也即是10% 顾名思义 采取10%的请求数据
+     #因为在分布式系统中，数据量可能会非常大，因此采样非常重要。我们示例数据少最好配置为1全采样
+feign:
+  hystrix:
+    enabled: true
+# feign的请求处理的超时时间
+ribbon:
+  ReadTimeout: 5000
+
+
+#设置超时时间 这是直接使用ribbon restTemp 的设置 当使用feign 不能这么设置
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 3000  #超时时间，当调用服务者，时间超过3秒则认定，服务挂掉
+    circuitBreaker:
+      requestVolumeThreshold: 5 #默认10秒内20次请求失败，断路器会打开，不会调用方法直接调用FullBack方法，此配置是修改失败次数
+                                #默认5秒为半打开
+#服务监控，暴露所有的端点
+managment:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+
+
+
+
+
+
+
+
+
+
+
+
